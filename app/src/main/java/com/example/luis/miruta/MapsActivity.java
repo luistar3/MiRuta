@@ -2,6 +2,7 @@ package com.example.luis.miruta;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -48,7 +49,7 @@ import java.util.jar.Manifest;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback ,GoogleMap.OnMapClickListener,GoogleMap.OnMapLongClickListener {
 
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private GoogleMap mMap;
@@ -87,6 +88,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+
+
+
+
         //texto = (TextView)findViewById(R.id.text1) ;
         // seleccionar el spinner
         spinner = (Spinner) findViewById(R.id.spinner3);
@@ -106,6 +111,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         ArrayAdapter<String> adaptador = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, rutas);
         spinner.setAdapter(adaptador);
 
+
+    }
+
+    @Override
+    public void onMapLongClick(LatLng latLng) {
+
+    }
+
+    @Override
+    public void onMapClick(LatLng latLng) {
 
     }
 
@@ -220,10 +235,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         miUbiacion();
 
-        // Add a marker in Sydney and move the camera
-//        LatLng sydney = new LatLng(-34, 151);
-//        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+       //  Add a marker in Sydney and move the camera
+        LatLng sydney = new LatLng(-34, 151);
+        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+       // mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
     public void agregarMarcodor(double lat, double lng) {
@@ -233,7 +248,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         marcador = mMap.addMarker(new MarkerOptions() // agregar marcador al mapa
                 .position(coodernadas)
-                .title("MIubicacion")
+                .title("MI Ubicacion")
                 .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher)));
         mMap.animateCamera(miUbicacion);
 
@@ -283,14 +298,44 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //        }
 //        mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0,locationListener);
 
-       if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(getApplicationContext()
+                , android.Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                &&ActivityCompat.checkSelfPermission(getApplicationContext()
+                ,android.Manifest.permission.ACCESS_COARSE_LOCATION) !=PackageManager.PERMISSION_GRANTED) {
 
-           return;
-       }
+            ActivityCompat.requestPermissions(MapsActivity.this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        }else {
+            if (!mMap.isMyLocationEnabled())
+                mMap.setMyLocationEnabled(true);
+
+            LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            Location myLocation = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+
+            if (myLocation == null){
+
+                Criteria criteria1 = new Criteria();
+                criteria1.setAccuracy(Criteria.ACCURACY_COARSE);
+                String provider = lm.getBestProvider(criteria1,true);
+
+                myLocation = lm.getLastKnownLocation(provider);
+
+
+
+            }
+            if (myLocation != null){
+                LatLng userLocation = new LatLng(myLocation.getLatitude(),myLocation.getLongitude());
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLocation,14),100,null);
+
+
+            }
+
+        }
+
        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
      actualizarUbicacion(location);
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,10000,0,locationListener);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,100,0,locationListener);
 
     }
 
