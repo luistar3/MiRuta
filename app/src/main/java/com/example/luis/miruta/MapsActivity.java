@@ -2,6 +2,7 @@ package com.example.luis.miruta;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -29,6 +30,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -49,7 +52,7 @@ import java.util.jar.Manifest;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback ,GoogleMap.OnMapClickListener,GoogleMap.OnMapLongClickListener {
+public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolylineClickListener ,OnMapReadyCallback ,GoogleMap.OnMapClickListener,GoogleMap.OnMapLongClickListener {
 
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private GoogleMap mMap;
@@ -95,7 +98,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //texto = (TextView)findViewById(R.id.text1) ;
         // seleccionar el spinner
         spinner = (Spinner) findViewById(R.id.spinner3);
-        new ConsultarDatos().execute("http://10.0.2.2/gpsmovil/consultarRutas.php");
+        new ConsultarDatos().execute("http://10.0.2.2:8080/gpsmovil/consultarRutas.php");
 
 
     }
@@ -122,6 +125,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapClick(LatLng latLng) {
 
+    }
+
+    @Override
+    public void onPolylineClick(Polyline polyline) {
+        Polyline line = mMap.addPolyline(new PolylineOptions()
+                .add(new LatLng(51.5, -0.1), new LatLng(40.7, -74.0))
+                .width(5)
+                .color(Color.RED));
     }
 
 
@@ -239,6 +250,52 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
        // mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+//        Polyline line = mMap.addPolyline(new PolylineOptions()
+//                .add(new LatLng(51.5, -0.1), new LatLng(40.7, -74.0))
+//                .width(30)
+//                .color(Color.RED));
+
+//        Polyline polyline1 = googleMap.addPolyline(new PolylineOptions()
+//                .clickable(true)
+//                .add(
+//                        new LatLng(-35.016, 143.321),
+//                        new LatLng(-34.747, 145.592),
+//                        new LatLng(-34.364, 147.891),
+//                        new LatLng(-33.501, 150.217),
+//                        new LatLng(-32.306, 149.248),
+//                        new LatLng(-32.491, 147.309))
+//                .width(20).color(Color.RED));
+
+
+
+        ArrayList<LatLng> coordList = new ArrayList<LatLng>();
+
+// Adding points to ArrayList
+        coordList.add(new LatLng(-18.00064985805495, -70.23515902584228));
+        coordList.add(new LatLng(-18.003710939035983, -70.23301325863036));
+        coordList.add(new LatLng(-18.005996511511366,-70.23627482479247));
+        coordList.add(new LatLng(-18.00750660563893,-70.23923598354492));
+        coordList.add(new LatLng(-18.00505779783065,-70.24129592006835));
+        coordList.add(new LatLng(-18.002404884317595,-70.237991438562));
+        coordList.add(new LatLng(-18.001017190578647,-70.23614607875976));
+        coordList.add(new LatLng(-18.000813117048846,-70.23490153377685));
+// etc...
+
+// Find map fragment. This line work only with support library
+
+
+        PolylineOptions polylineOptions = new PolylineOptions();
+
+// Create polyline options with existing LatLng ArrayList
+        polylineOptions.addAll(coordList);
+        polylineOptions
+                .width(25)
+                .color(Color.RED);
+
+// Adding multiple points in map using polyline and arraylist
+        mMap.addPolyline(polylineOptions);
+
+
     }
 
     public void agregarMarcodor(double lat, double lng) {
