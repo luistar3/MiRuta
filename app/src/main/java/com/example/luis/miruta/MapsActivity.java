@@ -111,7 +111,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
                     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
 
 
-                        //Toast.makeText(getBaseContext(),"Selecciono - "+rutas[position], Toast.LENGTH_LONG).show();
+                        Toast.makeText(getBaseContext(),"Selecciono - "+rutaId[position], Toast.LENGTH_LONG).show();
 
                     }
 
