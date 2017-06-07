@@ -16,6 +16,8 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.JsonReader;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -62,6 +64,10 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
     String rutaL;
     double lat = 0.0, lng = 0.0;
 
+    String[] rutas;
+    String[] rutaNom;
+    String[] rutaId;
+
 
 
 
@@ -98,7 +104,22 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
         //texto = (TextView)findViewById(R.id.text1) ;
         // seleccionar el spinner
         spinner = (Spinner) findViewById(R.id.spinner3);
-        new ConsultarDatos().execute("http://10.0.2.2:8080/gpsmovil/consultarRutas.php");
+        new ConsultarDatos().execute("http://10.0.2.2:80/gpsmovil/consultarRutas.php");
+
+                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+
+
+                        //Toast.makeText(getBaseContext(),"Selecciono - "+rutas[position], Toast.LENGTH_LONG).show();
+
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {
+
+                    }
+                });
 
 
     }
@@ -109,9 +130,37 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
     public void cargarlistado() {
 
         //texto.setText(rutaL);
-        String[] rutas = rutaL.split(",");
+         rutas = rutaL.split(",");
+        String NomRuta="";
+        String IdRuta="";
+
+        String com="";
+        boolean valor=true;
+        //Toast.makeText(getBaseContext(),"catidad - "+rutas.length, Toast.LENGTH_LONG).show();
+
+        for (int u=0; u < rutas.length;u++){
+
+            com+=rutas[u];
+            if (valor==true){
+                NomRuta+= rutas[u];
+                valor=false;
+            }
+            else {
+                IdRuta+=rutas[u];
+                valor=true;
+
+            }
+
+        }
+        IdRuta = IdRuta.substring(1);// elimniar 2 primero caraceteres
+        rutaNom=NomRuta.split("\"");
+        rutaId=IdRuta.split("\"");
+
+        //Toast.makeText(getBaseContext(),"texto - "+IdRuta, Toast.LENGTH_LONG).show();
+
+
         // agregar elemento del array a spinner
-        ArrayAdapter<String> adaptador = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, rutas);
+        ArrayAdapter<String> adaptador = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, rutaNom);
         spinner.setAdapter(adaptador);
 
 
@@ -133,6 +182,66 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
                 .add(new LatLng(51.5, -0.1), new LatLng(40.7, -74.0))
                 .width(5)
                 .color(Color.RED));
+    }
+
+
+    //metodo asincron para consultar Rutas
+    private class ConsultarTrutas extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... urls) {
+
+            // params comes from the execute() call: params[0] is the url.
+
+            try {
+                return downloadUrl(urls[0]);
+            } catch (IOException e) {
+                return "Unable to retrieve web page. URL may be invalid.";
+            }
+        }
+
+        // onPostExecute displays the results of the AsyncTask.
+        @Override
+        protected void onPostExecute(String result) {
+
+            JSONArray ruta = null;
+
+
+            try {
+                ruta = new JSONArray(result);
+                StringBuilder stringBuilder = new StringBuilder();
+                // int ca= ruta.length();
+                // texto.setText(ruta.getString(2)+ca);
+
+                String carac1, carac2, carac = "";
+                for (int i = 0; i < ruta.length(); i++) {
+                    lista_rutas.add(ruta.getString(i)); //creamos un objeto ruta y lo insertamos en la lista
+                }
+                for (int i = 0; i < lista_rutas.size(); i++) {
+                    carac = lista_rutas.get(i);
+                    carac1 = carac.substring(0, carac.length() - 2);// eliminar 2 ultimos caracteres
+                    carac2 = carac1.substring(2);// elimniar 2 primero caraceteres
+                    stringBuilder.append(carac2);
+                    if (i == lista_rutas.size() - 1) {
+                    } else {
+                        stringBuilder.append(",");
+                    }
+                }
+
+
+                String diaArray[] = ruta.getString(1).split(",");
+                String finalString = stringBuilder.toString();
+                // texto.setText(String.valueOf(lista_rutas.size()));
+                // texto.setText(finalString);
+                rutaL = finalString;
+                cargarlistado();
+                //texto.setText(rutaL);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+
+        }
     }
 
 
@@ -249,24 +358,6 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
        //  Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-       // mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-//        Polyline line = mMap.addPolyline(new PolylineOptions()
-//                .add(new LatLng(51.5, -0.1), new LatLng(40.7, -74.0))
-//                .width(30)
-//                .color(Color.RED));
-
-//        Polyline polyline1 = googleMap.addPolyline(new PolylineOptions()
-//                .clickable(true)
-//                .add(
-//                        new LatLng(-35.016, 143.321),
-//                        new LatLng(-34.747, 145.592),
-//                        new LatLng(-34.364, 147.891),
-//                        new LatLng(-33.501, 150.217),
-//                        new LatLng(-32.306, 149.248),
-//                        new LatLng(-32.491, 147.309))
-//                .width(20).color(Color.RED));
-
-
 
         ArrayList<LatLng> coordList = new ArrayList<LatLng>();
 
