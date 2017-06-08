@@ -104,14 +104,17 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
         //texto = (TextView)findViewById(R.id.text1) ;
         // seleccionar el spinner
         spinner = (Spinner) findViewById(R.id.spinner3);
-        new ConsultarDatos().execute("http://10.0.2.2:80/gpsmovil/consultarRutas.php");
+        new ConsultarDatos().execute("http://10.0.2.2:8080/gpsmovil/consultarRutas.php");
 
                 spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
 
 
-                        Toast.makeText(getBaseContext(),"Selecciono - "+rutaId[position], Toast.LENGTH_LONG).show();
+                       Toast.makeText(getBaseContext(),"Selecciono - "+rutaId[position], Toast.LENGTH_LONG).show();
+
+                        new ConsultarTrasadorutas().execute("http://10.0.2.2:8080/gpsmovil/consultarTrasadoRutas.php?id="+rutaId[position]+"");
+                        //new ConsultarTrasadorutas().execute("http://10.0.2.2:8080/gpsmovil/consultarTrasadoRutas.php?id=10945988182");
 
                     }
 
@@ -186,7 +189,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
 
 
     //metodo asincron para consultar Rutas
-    private class ConsultarTrutas extends AsyncTask<String, Void, String> {
+    private class ConsultarTrasadorutas extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... urls) {
 
@@ -203,38 +206,14 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
         @Override
         protected void onPostExecute(String result) {
 
-            JSONArray ruta = null;
+            JSONArray rutatrasado ;
 
 
             try {
-                ruta = new JSONArray(result);
-                StringBuilder stringBuilder = new StringBuilder();
-                // int ca= ruta.length();
-                // texto.setText(ruta.getString(2)+ca);
+                rutatrasado = new JSONArray(result);
 
-                String carac1, carac2, carac = "";
-                for (int i = 0; i < ruta.length(); i++) {
-                    lista_rutas.add(ruta.getString(i)); //creamos un objeto ruta y lo insertamos en la lista
-                }
-                for (int i = 0; i < lista_rutas.size(); i++) {
-                    carac = lista_rutas.get(i);
-                    carac1 = carac.substring(0, carac.length() - 2);// eliminar 2 ultimos caracteres
-                    carac2 = carac1.substring(2);// elimniar 2 primero caraceteres
-                    stringBuilder.append(carac2);
-                    if (i == lista_rutas.size() - 1) {
-                    } else {
-                        stringBuilder.append(",");
-                    }
-                }
+                Toast.makeText(getBaseContext(),"trasado- "+rutatrasado, Toast.LENGTH_LONG).show();
 
-
-                String diaArray[] = ruta.getString(1).split(",");
-                String finalString = stringBuilder.toString();
-                // texto.setText(String.valueOf(lista_rutas.size()));
-                // texto.setText(finalString);
-                rutaL = finalString;
-                cargarlistado();
-                //texto.setText(rutaL);
 
             } catch (JSONException e) {
                 e.printStackTrace();
