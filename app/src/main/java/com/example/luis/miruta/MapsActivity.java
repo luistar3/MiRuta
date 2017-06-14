@@ -104,18 +104,21 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
         //texto = (TextView)findViewById(R.id.text1) ;
         // seleccionar el spinner
         spinner = (Spinner) findViewById(R.id.spinner3);
-        new ConsultarDatos().execute("http://10.0.2.2:8080/gpsmovil/consultarRutas.php");
+        new ConsultarDatos().execute("http://10.0.2.2:80/gpsmovil/consultarRutas.php");
+
+
 
                 spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                       // rutaId[2]=rutaId[0];
 
 
-                       Toast.makeText(getBaseContext(),"Selecciono - "+rutaId[position], Toast.LENGTH_LONG).show();
 
-                        new ConsultarTrasadorutas().execute("http://10.0.2.2:8080/gpsmovil/consultarTrasadoRutas.php?id="+rutaId[position]+"");
+                        new ConsultarTrasadorutas().execute("http://10.0.2.2:80/gpsmovil/consultarTrasadoRutas.php?id="+rutaId[position]+"");
                         //new ConsultarTrasadorutas().execute("http://10.0.2.2:8080/gpsmovil/consultarTrasadoRutas.php?id=10945988182");
 
+                       // Toast.makeText(getBaseContext(),"caracteres- "+rutaId[position].length(), Toast.LENGTH_LONG).show();
                     }
 
                     @Override
@@ -212,7 +215,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
             try {
                 rutatrasado = new JSONArray(result);
 
-                Toast.makeText(getBaseContext(),"trasado- "+rutatrasado, Toast.LENGTH_LONG).show();
+                Toast.makeText(getBaseContext(),"coordenadas- "+rutatrasado, Toast.LENGTH_LONG).show();
 
 
             } catch (JSONException e) {
@@ -292,7 +295,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
         // web page content.
 
 
-        int len = 500;
+        int len = 10000;
 
         try {
             URL url = new URL(myurl);
