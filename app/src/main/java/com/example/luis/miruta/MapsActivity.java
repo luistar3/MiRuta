@@ -37,6 +37,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -57,8 +58,17 @@ import javax.net.ssl.HttpsURLConnection;
 public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolylineClickListener ,OnMapReadyCallback ,GoogleMap.OnMapClickListener,GoogleMap.OnMapLongClickListener {
 
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
-    private GoogleMap mMap;
+    public GoogleMap mMap;
     private Marker marcador; // marcador par nuestra ubicaccion
+    List<Double> listLatitud= new ArrayList<>();
+    List<Double> listLongitud= new ArrayList<>();
+    ArrayList<LatLng> listaCoordenadas;
+    List<Double> listLat= new ArrayList<>();
+    List<Double> listLng= new ArrayList<>();
+    PolylineOptions polylineOptions;
+    Polyline polylineFinal;
+
+    TratamientoCoordenadas tra = new TratamientoCoordenadas();
     Spinner spinner;// lista para rutas
     TextView texto;
     String rutaL;
@@ -67,7 +77,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
     String[] rutas;
     String[] rutaNom;
     String[] rutaId;
-
+    int co=0;
 
 
 
@@ -84,6 +94,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
 
 
     List<String> lista_rutas = new ArrayList<>();// listado e rutas
+
 
 
 
@@ -111,11 +122,18 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
                 spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-                       // rutaId[2]=rutaId[0];
+                        listaCoordenadas = new ArrayList<LatLng>();
+                        polylineOptions = new PolylineOptions();
+                        limpiaArray();
+                        co=co+1;
+                        if (polylineFinal==null){
+                        }
+                        else {
+                            polylineFinal.remove();
+                        }
+                   // rutaId[2]=rutaId[0];
+                       new ConsultarTrasadorutas().execute("http://10.0.2.2:80/gpsmovil/consultarTrasadoRutas.php?id="+rutaId[position]+"");
 
-
-
-                        new ConsultarTrasadorutas().execute("http://10.0.2.2:80/gpsmovil/consultarTrasadoRutas.php?id="+rutaId[position]+"");
                         //new ConsultarTrasadorutas().execute("http://10.0.2.2:8080/gpsmovil/consultarTrasadoRutas.php?id=10945988182");
 
                        // Toast.makeText(getBaseContext(),"caracteres- "+rutaId[position].length(), Toast.LENGTH_LONG).show();
@@ -210,13 +228,13 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
         protected void onPostExecute(String result) {
 
             JSONArray rutatrasado ;
-
-
             try {
+
                 rutatrasado = new JSONArray(result);
 
-                Toast.makeText(getBaseContext(),"coordenadas- "+rutatrasado, Toast.LENGTH_LONG).show();
-
+                corrlat(rutatrasado );
+                colocarPolylineas();
+               // Toast.makeText(getBaseContext(),"coordenadas- "+result, Toast.LENGTH_LONG).show();
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -224,6 +242,78 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
 
 
         }
+    }
+
+    void limpiaArray(){
+
+
+         listLat.clear();
+        listLng.clear();
+        listaCoordenadas.clear();
+
+
+
+    }
+    public void colocarPolylineas(){
+
+        for (int i = 0; i < listLat.size(); i++) {
+
+            listaCoordenadas.add(new LatLng(listLat.get(i),listLng.get(i)));
+        }
+        // etc...
+
+// Find map fragment. This line work only with support library
+        Toast.makeText(getBaseContext(),">"+ listaCoordenadas.size(), Toast.LENGTH_SHORT).show();
+
+// Create polyline options with existing LatLng ArrayList
+        polylineOptions.addAll(listaCoordenadas);
+        polylineOptions
+                .width(25)
+                .color(Color.RED)
+                .geodesic(true);
+
+// Adding multiple points in map using polyline and arraylist
+       // mMap.addPolyline(polylineOptions);
+
+        polylineFinal = mMap.addPolyline (polylineOptions);
+
+    }
+    void  corrlat (JSONArray re){
+
+        List<String> lista_LatLong = new ArrayList<>();
+
+
+        lista_LatLong.clear();
+        listLat.clear();
+        listLng.clear();
+        String ll="";
+        try {
+            for (int i = 0; i < re.length(); i++) {
+                lista_LatLong.add(re.getString(i)); //creamos un objeto ruta y lo insertamos en la lista
+            }
+           for (int i = 0; i < lista_LatLong.size(); i++) {
+
+                ll= lista_LatLong.get(i).replace("[","");
+            ll= ll.replace("]","");
+            ll= ll.replace("\"","");
+
+                String [] lat= ll.split(",");
+              //  Toast.makeText(getBaseContext(),">"+lat[0], Toast.LENGTH_SHORT).show();
+                String a = lat[0];
+                String b = lat[1];
+
+            listLat.add(Double.parseDouble(a));
+               listLng.add(Double.parseDouble(b));
+           }
+          //  Toast.makeText(getBaseContext(),">"+listLat.get(1), Toast.LENGTH_SHORT).show();
+
+
+
+        }catch (Exception io){
+
+
+        }
+
     }
 
 
@@ -341,32 +431,8 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
         LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
 
-        ArrayList<LatLng> coordList = new ArrayList<LatLng>();
-
-// Adding points to ArrayList
-        coordList.add(new LatLng(-18.00064985805495, -70.23515902584228));
-        coordList.add(new LatLng(-18.003710939035983, -70.23301325863036));
-        coordList.add(new LatLng(-18.005996511511366,-70.23627482479247));
-        coordList.add(new LatLng(-18.00750660563893,-70.23923598354492));
-        coordList.add(new LatLng(-18.00505779783065,-70.24129592006835));
-        coordList.add(new LatLng(-18.002404884317595,-70.237991438562));
-        coordList.add(new LatLng(-18.001017190578647,-70.23614607875976));
-        coordList.add(new LatLng(-18.000813117048846,-70.23490153377685));
-// etc...
-
-// Find map fragment. This line work only with support library
 
 
-        PolylineOptions polylineOptions = new PolylineOptions();
-
-// Create polyline options with existing LatLng ArrayList
-        polylineOptions.addAll(coordList);
-        polylineOptions
-                .width(25)
-                .color(Color.RED);
-
-// Adding multiple points in map using polyline and arraylist
-        mMap.addPolyline(polylineOptions);
 
 
     }
