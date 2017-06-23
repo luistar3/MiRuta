@@ -23,7 +23,7 @@ import java.util.List;
 public class TratamientoCoordenadas {
 
     ArrayList<String> puntos = new ArrayList<>();
-    double haverdistanceKM;
+
 
 
    public ArrayList<String> tratarPuntos(String j,double latUsu, double lngUsu){
@@ -42,7 +42,15 @@ public class TratamientoCoordenadas {
                ll= ll.replace("]","");
                ll= ll.replace("\"","");
 
-               cadenaPuntos.add(ll);
+               String [] lat= ll.split(",");
+
+               double distanci = distanciaUsu(latUsu,lngUsu,Double.parseDouble(lat[5]),Double.parseDouble(lat[6]));
+               Double tiempo = distanci/Double.parseDouble(lat[9]);
+
+               String datos = lat[2]+","+lat[5]+","+lat[6]+","+String.valueOf(distanci)+","+tiempo+","+lat[9];//  placa - latitud - logitud - distancia- tiempo - velocidad
+
+
+               cadenaPuntos.add(datos);
            }
            //  Toast.makeText(getBaseContext(),">"+listLat.get(1), Toast.LENGTH_SHORT).show();
 
@@ -56,8 +64,8 @@ public class TratamientoCoordenadas {
 
    }
 
-    public double haversine(double lat1, double lon1, double lat2, double lon2) {
-
+    public double distanciaUsu(double lat1, double lon1, double lat2, double lon2) {
+        double haverdistanceKM;
         double Rad = 6372.8; //Earth's Radius In kilometers
         // TODO Auto-generated method stub
         double dLat = Math.toRadians(lat2 - lat1);

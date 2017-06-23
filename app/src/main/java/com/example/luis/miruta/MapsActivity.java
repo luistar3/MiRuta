@@ -60,6 +60,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     public GoogleMap mMap;
     private Marker marcador; // marcador par nuestra ubicaccion
+    private Marker mar; // marcadores de vehiculos
     List<Double> listLatitud= new ArrayList<>();
     List<Double> listLongitud= new ArrayList<>();
     ArrayList<LatLng> listaCoordenadas;
@@ -81,7 +82,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
     Double Flatitud;
     Double Flogitud;
 
-
+    List<Marker> markers = new ArrayList<Marker>();
 
 
 
@@ -124,9 +125,11 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
                 spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                        mMap.clear();
                         listaCoordenadas = new ArrayList<LatLng>();
                         polylineOptions = new PolylineOptions();
                         limpiaArray();
+                        agregarMarcodora();
                         co=co+1;
                         if (polylineFinal==null){
                         }
@@ -166,22 +169,62 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
         protected void onPostExecute(String result) {
 
             ArrayList<String> puntosa = new ArrayList<>();
-            Toast.makeText(getBaseContext(),"lati"+Flatitud+"long"+Flogitud,Toast.LENGTH_LONG).show();
+           // Toast.makeText(getBaseContext(),"lati"+Flatitud+"long"+Flogitud,Toast.LENGTH_LONG).show();
 
             puntosa=tra.tratarPuntos(result,Flatitud,Flogitud);
+          //  Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(-18.019483, -70.243231)));
+//            marcador = mMap.addMarker(new MarkerOptions() // agregar marcador al mapa
+//                    .position(coodernadas)
+//                    .title("MI Ubicacion")
+//                    .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher)));
 
 //            JSONArray puntos ;
-//            try {
+//              marcador = mMap.addMarker(new MarkerOptions() // agregar marcador al mapa
+//                        .position(coodernadas)
+//                    .title("MI Ubicacion")
+//                    .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher)));
 //
 //                puntos= new JSONArray(result);
 //
 //               // corrlat(rutatrasado );
 //               // colocarPolylineas();
-                Toast.makeText(getBaseContext(),""+puntosa,Toast.LENGTH_LONG).show();
+
+//            Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(-18.019483, -70.243231)));
+//            marker.remove();
+
+
+
+//            for (int i=0;i < puntosa.size(); i++){
 //
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
+//                LatLng coodernadas = new LatLng(Double.parseDouble(puntosa.get(1)),Double.parseDouble(puntosa.get(2)));
+//
+//                Toast.makeText(getBaseContext(),""+puntosa.get(i),Toast.LENGTH_LONG).show();// placa - latitud - logitud - distancia- tiempo - velocidad
+//                marcador = mMap.addMarker(
+//
+//                        new MarkerOptions() // agregar marcador al mapa
+//                        .position(coodernadas)
+//                        .title("Placa: "+puntosa.get(0)+"\n Distanci: "+puntosa.get(3)+"\n Tiempo: "+puntosa.get(4)+"\n Velocidad: "+puntosa.get(5))
+//
+//
+//                );
+//                }
+
+            for (int i = 0; i < puntosa.size(); i++) {
+
+                String[] d = puntosa.get(i).split(",");
+              Marker mir= mMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(Double.parseDouble(d[1]), Double.parseDouble(d[2])))
+                        .title("Placa: "+d[0]+"\n Distanci: "+d[3]+"\n Tiempo: "+d[4]+"\n Velocidad: "+d[5])
+
+                );
+                mir.showInfoWindow();
+                markers.add(mir);
+
+            }
+
+
+
+
 
         }
     }
@@ -294,7 +337,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
         // etc...
 
 // Find map fragment. This line work only with support library
-        Toast.makeText(getBaseContext(),">"+ listaCoordenadas.size(), Toast.LENGTH_SHORT).show();
+//      Toast.makeText(getBaseContext(),">"+ listaCoordenadas.size(), Toast.LENGTH_SHORT).show();
 
 // Create polyline options with existing LatLng ArrayList
         polylineOptions.addAll(listaCoordenadas);
@@ -467,6 +510,17 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
 
 
     }
+    public void agregarMarcodora() {
+
+        LatLng coodernadas = new LatLng(Flatitud, Flogitud);
+       // CameraUpdate miUbicacion = CameraUpdateFactory.newLatLngZoom(coodernadas, 100);
+        if (marcador != null) marcador.remove();
+
+        marcador = mMap.addMarker(new MarkerOptions() // agregar marcador al mapa
+                .position(coodernadas)
+                .title("MI Ubicacion")
+                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher)));
+        }
 
     public void agregarMarcodor(double lat, double lng) {
         Flatitud=lat;
