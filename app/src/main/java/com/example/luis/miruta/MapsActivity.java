@@ -99,7 +99,9 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
     List<String> lista_rutas = new ArrayList<>();// listado e rutas
 
 
+        private View popup=null;
 
+    String PosicionAc="";
 
 
             @Override
@@ -125,7 +127,8 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
                 spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-                        mMap.clear();
+                        //mMap.clear();
+                        //eliminar_Marker();
                         listaCoordenadas = new ArrayList<LatLng>();
                         polylineOptions = new PolylineOptions();
                         limpiaArray();
@@ -136,7 +139,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
                         else {
                             polylineFinal.remove();
                         }
-
+                        PosicionAc = String.valueOf(rutaId[position]);
                        new ConsultarTrasadorutas().execute("http://10.0.2.2:80/gpsmovil/consultarTrasadoRutas.php?id="+rutaId[position]+"");
                         new ConsultarPuntosVehiculos().execute("http://10.0.2.2:80/gpsmovil/consultarPuntosRuta.php?id="+rutaId[position]+"");
 
@@ -168,53 +171,23 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
         @Override
         protected void onPostExecute(String result) {
 
+            eliminar_Marker();
             ArrayList<String> puntosa = new ArrayList<>();
            // Toast.makeText(getBaseContext(),"lati"+Flatitud+"long"+Flogitud,Toast.LENGTH_LONG).show();
 
             puntosa=tra.tratarPuntos(result,Flatitud,Flogitud);
-          //  Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(-18.019483, -70.243231)));
-//            marcador = mMap.addMarker(new MarkerOptions() // agregar marcador al mapa
-//                    .position(coodernadas)
-//                    .title("MI Ubicacion")
-//                    .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher)));
 
-//            JSONArray puntos ;
-//              marcador = mMap.addMarker(new MarkerOptions() // agregar marcador al mapa
-//                        .position(coodernadas)
-//                    .title("MI Ubicacion")
-//                    .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher)));
-//
-//                puntos= new JSONArray(result);
-//
-//               // corrlat(rutatrasado );
-//               // colocarPolylineas();
-
-//            Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(-18.019483, -70.243231)));
-//            marker.remove();
-
-
-
-//            for (int i=0;i < puntosa.size(); i++){
-//
-//                LatLng coodernadas = new LatLng(Double.parseDouble(puntosa.get(1)),Double.parseDouble(puntosa.get(2)));
-//
-//                Toast.makeText(getBaseContext(),""+puntosa.get(i),Toast.LENGTH_LONG).show();// placa - latitud - logitud - distancia- tiempo - velocidad
-//                marcador = mMap.addMarker(
-//
-//                        new MarkerOptions() // agregar marcador al mapa
-//                        .position(coodernadas)
-//                        .title("Placa: "+puntosa.get(0)+"\n Distanci: "+puntosa.get(3)+"\n Tiempo: "+puntosa.get(4)+"\n Velocidad: "+puntosa.get(5))
-//
-//
-//                );
-//                }
-
-            for (int i = 0; i < puntosa.size(); i++) {
+        for (int i = 0; i < puntosa.size(); i++) {
 
                 String[] d = puntosa.get(i).split(",");
               Marker mir= mMap.addMarker(new MarkerOptions()
+                        .title("Placa: "+d[0])
+
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.van))
                         .position(new LatLng(Double.parseDouble(d[1]), Double.parseDouble(d[2])))
-                        .title("Placa: "+d[0]+"\n Distanci: "+d[3]+"\n Tiempo: "+d[4]+"\n Velocidad: "+d[5])
+                      .snippet("Dist:"+d[3]+"\n Tiempo: "+d[4]+"\n Velocidad: "+d[5])
+
+
 
                 );
                 mir.showInfoWindow();
@@ -223,10 +196,17 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
             }
 
 
+        }
 
 
+    }
+    public void eliminar_Marker(){
+
+        for (Marker mir : markers){
+            mir.remove();
 
         }
+        markers.clear();
     }
 
     //funcion par acargar spinner en el metodo asynctask
@@ -290,6 +270,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
 
     //metodo asincron para consultar Lineas para Trasar Rutas
     private class ConsultarTrasadorutas extends AsyncTask<String, Void, String> {
+
         @Override
         protected String doInBackground(String... urls) {
 
@@ -301,6 +282,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
         }
         @Override
         protected void onPostExecute(String result) {
+
 
             JSONArray rutatrasado ;
             try {
@@ -343,7 +325,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
         polylineOptions.addAll(listaCoordenadas);
         polylineOptions
                 .width(25)
-                .color(Color.RED)
+                .color(Color.BLUE)
                 .geodesic(true);
 
 // Adding multiple points in map using polyline and arraylist
@@ -501,13 +483,27 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
 
         miUbiacion();
 
-       //  Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        mMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+
+            @Override
+            public void onMarkerDragStart(Marker marker) {
+            }
+
+            @Override
+            public void onMarkerDragEnd(Marker marker) {
+                 Flatitud=marker.getPosition().latitude;
+                Flogitud=marker.getPosition().longitude;
+                agregarMarcodora();
+                new ConsultarPuntosVehiculos().execute("http://10.0.2.2:80/gpsmovil/consultarPuntosRuta.php?id="+PosicionAc+"");
 
 
+            }
 
+            @Override
+            public void onMarkerDrag(Marker marker) {
+            }
 
+        });
 
     }
     public void agregarMarcodora() {
@@ -519,20 +515,23 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
         marcador = mMap.addMarker(new MarkerOptions() // agregar marcador al mapa
                 .position(coodernadas)
                 .title("MI Ubicacion")
-                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher)));
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.boy))
+                .draggable(true))
+        ;
         }
+
 
     public void agregarMarcodor(double lat, double lng) {
         Flatitud=lat;
         Flogitud=lng;
         LatLng coodernadas = new LatLng(lat, lng);
-        CameraUpdate miUbicacion = CameraUpdateFactory.newLatLngZoom(coodernadas, 100);
+        CameraUpdate miUbicacion = CameraUpdateFactory.newLatLng(coodernadas);
         if (marcador != null) marcador.remove();
 
         marcador = mMap.addMarker(new MarkerOptions() // agregar marcador al mapa
                 .position(coodernadas)
                 .title("MI Ubicacion")
-                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher)));
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.boy)).draggable(true));
         mMap.animateCamera(miUbicacion);
 
     }
@@ -543,6 +542,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
             lng = location.getLongitude();
             agregarMarcodor(lat, lng);
         }
+        new ConsultarPuntosVehiculos().execute("http://10.0.2.2:80/gpsmovil/consultarPuntosRuta.php?id="+PosicionAc+"");
 
     }
 
