@@ -78,6 +78,8 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
     String[] rutaNom;
     String[] rutaId;
     int co=0;
+    Double Flatitud;
+    Double Flogitud;
 
 
 
@@ -131,8 +133,9 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
                         else {
                             polylineFinal.remove();
                         }
-                   // rutaId[2]=rutaId[0];
+
                        new ConsultarTrasadorutas().execute("http://10.0.2.2:80/gpsmovil/consultarTrasadoRutas.php?id="+rutaId[position]+"");
+                        new ConsultarPuntosVehiculos().execute("http://10.0.2.2:80/gpsmovil/consultarPuntosRuta.php?id="+rutaId[position]+"");
 
                         //new ConsultarTrasadorutas().execute("http://10.0.2.2:8080/gpsmovil/consultarTrasadoRutas.php?id=10945988182");
 
@@ -148,7 +151,40 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
 
     }
 
+    //metodo asincro.. para consultar los marcadores de los vehiculos
+    private class ConsultarPuntosVehiculos extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... urls) {
 
+            try {
+                return downloadUrl(urls[0]);
+            } catch (IOException e) {
+                return "Unable to retrieve web page. URL may be invalid.";
+            }
+        }
+        @Override
+        protected void onPostExecute(String result) {
+
+            ArrayList<String> puntosa = new ArrayList<>();
+            Toast.makeText(getBaseContext(),"lati"+Flatitud+"long"+Flogitud,Toast.LENGTH_LONG).show();
+
+            puntosa=tra.tratarPuntos(result,Flatitud,Flogitud);
+
+//            JSONArray puntos ;
+//            try {
+//
+//                puntos= new JSONArray(result);
+//
+//               // corrlat(rutatrasado );
+//               // colocarPolylineas();
+                Toast.makeText(getBaseContext(),""+puntosa,Toast.LENGTH_LONG).show();
+//
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+
+        }
+    }
 
     //funcion par acargar spinner en el metodo asynctask
     public void cargarlistado() {
@@ -209,12 +245,10 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
     }
 
 
-    //metodo asincron para consultar Rutas
+    //metodo asincron para consultar Lineas para Trasar Rutas
     private class ConsultarTrasadorutas extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... urls) {
-
-            // params comes from the execute() call: params[0] is the url.
 
             try {
                 return downloadUrl(urls[0]);
@@ -222,8 +256,6 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
                 return "Unable to retrieve web page. URL may be invalid.";
             }
         }
-
-        // onPostExecute displays the results of the AsyncTask.
         @Override
         protected void onPostExecute(String result) {
 
@@ -239,7 +271,6 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
 
         }
     }
@@ -438,6 +469,8 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
     }
 
     public void agregarMarcodor(double lat, double lng) {
+        Flatitud=lat;
+        Flogitud=lng;
         LatLng coodernadas = new LatLng(lat, lng);
         CameraUpdate miUbicacion = CameraUpdateFactory.newLatLngZoom(coodernadas, 100);
         if (marcador != null) marcador.remove();

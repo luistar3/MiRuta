@@ -1,6 +1,7 @@
 package com.example.luis.miruta;
 
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.util.Log;
 import android.widget.Toast;
@@ -21,54 +22,53 @@ import java.util.List;
 
 public class TratamientoCoordenadas {
 
+    ArrayList<String> puntos = new ArrayList<>();
+    double haverdistanceKM;
 
-   void tratarLnt(String j){
 
-
-       List<String> lista_LatLong = new ArrayList<>();
-       List<Double> listLat= new ArrayList<>();
-       String ll;
-       String [] lat;
-       JSONArray re ;
+   public ArrayList<String> tratarPuntos(String j,double latUsu, double lngUsu){
+            JSONArray re;
+       ArrayList<String> puntos = new ArrayList<>();
+       ArrayList<String> cadenaPuntos = new ArrayList<>();
+        String ll;
        try {
            re = new JSONArray(j);
            for (int i = 0; i < re.length(); i++) {
-               lista_LatLong.add(re.getString(i)); //creamos un objeto ruta y lo insertamos en la lista
+               puntos.add(re.getString(i)); //creamos un objeto ruta y lo insertamos en la lista
            }
+           for (int i = 0; i < puntos.size(); i++) {
 
-
-           for (int i = 0; i < lista_LatLong.size(); i++) {
-//
-               ll= lista_LatLong.get(0).replace("[","");
+               ll= puntos.get(i).replace("[","");
                ll= ll.replace("]","");
                ll= ll.replace("\"","");
 
-               lat= ll.split(",");
-//;
-//
-
-//
-//                listLat.add(Double.parseDouble(lat));
-//
+               cadenaPuntos.add(ll);
            }
+           //  Toast.makeText(getBaseContext(),">"+listLat.get(1), Toast.LENGTH_SHORT).show();
 
 
-
-
-           // Toast.makeText(getBaseContext(),""+lat[0], Toast.LENGTH_LONG).show();
+          // return cadenaPuntos;
        }catch (Exception io){
 
 
        }
-
-
+       return cadenaPuntos;
 
    }
 
-    void tratarLng(String j){
+    public double haversine(double lat1, double lon1, double lat2, double lon2) {
 
-        ArrayList<Double> arrayListLat;
+        double Rad = 6372.8; //Earth's Radius In kilometers
+        // TODO Auto-generated method stub
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        lat1 = Math.toRadians(lat1);
+        lat2 = Math.toRadians(lat2);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
+        double c = 2 * Math.asin(Math.sqrt(a));
+        return haverdistanceKM = (Rad * c);
 
     }
+
 
 }
