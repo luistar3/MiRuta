@@ -525,7 +525,8 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
         Flatitud=lat;
         Flogitud=lng;
         LatLng coodernadas = new LatLng(lat, lng);
-        CameraUpdate miUbicacion = CameraUpdateFactory.newLatLng(coodernadas);
+       // CameraUpdate miUbicacion = CameraUpdateFactory.newLatLng(coodernadas);
+        CameraUpdate miUbicacion = CameraUpdateFactory.newLatLngZoom(coodernadas,15);
         if (marcador != null) marcador.remove();
 
         marcador = mMap.addMarker(new MarkerOptions() // agregar marcador al mapa
