@@ -12,6 +12,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,11 +46,12 @@ public class TratamientoCoordenadas {
                String [] lat= ll.split(",");
 
                double distanci = distanciaUsu(latUsu,lngUsu,Double.parseDouble(lat[5]),Double.parseDouble(lat[6]));
-               Double tiempo = distanci/Double.parseDouble(lat[9]);
+               double distancia = Math.round(distanci * 100.0) / 100.0;
+               Double tiempo = (distancia/Double.parseDouble(lat[9]))/60;
 
-               String datos = lat[2]+","+lat[5]+","+lat[6]+","+String.valueOf(distanci)+","+tiempo+","+lat[9];//  placa - latitud - logitud - distancia- tiempo - velocidad
 
 
+               String datos = lat[2]+","+lat[5]+","+lat[6]+","+String.valueOf(distancia)+","+tiempo+","+lat[9];//  placa - latitud - logitud - distancia- tiempo - velocidad
                cadenaPuntos.add(datos);
            }
            //  Toast.makeText(getBaseContext(),">"+listLat.get(1), Toast.LENGTH_SHORT).show();

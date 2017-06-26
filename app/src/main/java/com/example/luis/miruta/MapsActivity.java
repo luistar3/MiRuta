@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,6 +40,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -46,7 +48,9 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
+import java.net.Socket;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.Manifest;
@@ -146,6 +150,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
                         //new ConsultarTrasadorutas().execute("http://10.0.2.2:8080/gpsmovil/consultarTrasadoRutas.php?id=10945988182");
 
                        // Toast.makeText(getBaseContext(),"caracteres- "+rutaId[position].length(), Toast.LENGTH_LONG).show();
+
                     }
 
                     @Override
@@ -185,7 +190,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
 
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.van))
                         .position(new LatLng(Double.parseDouble(d[1]), Double.parseDouble(d[2])))
-                      .snippet("Dist:"+d[3]+"\n Tiempo: "+d[4]+"\n Velocidad: "+d[5])
+                      .snippet("Dist:"+d[3]+"Km Velocidad: "+d[5]+"km/h Tiempo: "+d[4])
 
 
 
@@ -622,6 +627,58 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,100,0,locationListener);
 
     }
+//    public void hilo(){
+//        try {
+//            //espera 1 segundo y muere
+//            Thread.sleep(2000);//1000=1 segundo
+//            new ConsultarPuntosVehiculos().execute("http://10.0.2.2:80/gpsmovil/consultarPuntosRuta.php?id="+PosicionAc+"");
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//    }
+//    public void ejecutar(){
+//        Time time=new Time();
+//        time.execute();
+//
+//    }
+
+
+    //Clase Time asincrona
+//    public class Time extends AsyncTask<Void,Integer,Boolean> {
+//
+//        //Que trabaje En segundo plano
+//        @Override
+//        protected Boolean doInBackground(Void... voids) {
+//            for (int i=1;i<=30;i++){
+//                hilo();
+//            }
+//            return true;//retorna true despues de 3 segundos
+//        }
+//
+//        //bota el resultado luego de que se analize en segundo plano
+//        //con Ctrl+O se pueden ver los metodos que se pueden aplciar
+//        @Override
+//        protected void onPostExecute(Boolean aBoolean) {
+//
+//            //new ConsultarPuntosVehiculos().execute("http://10.0.2.2:80/gpsmovil/consultarPuntosRuta.php?id="+PosicionAc+"");
+//            //ejecutar();
+//            //Toast.makeText(MainActivity.this,"Cada 3 segundos",Toast.LENGTH_SHORT).show();
+//        }
+//
+//        @Override
+//        protected void onCancelled() {
+////            super.onCancelled();
+////            Button boton;
+////            boton=(Button)findViewById(R.id.btn_detener);
+////            boton.setOnClickListener(new View.OnClickListener() {
+////                @Override
+////                public void onClick(View v) {
+////                    Time time=new Time();
+////                    time.cancel(true);
+////                }
+////            });
+//        }
+//    }
 
 
 
