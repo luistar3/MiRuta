@@ -124,7 +124,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
         //texto = (TextView)findViewById(R.id.text1) ;
         // seleccionar el spinner
         spinner = (Spinner) findViewById(R.id.spinner3);
-        new ConsultarDatos().execute("http://10.0.2.2:80/gpsmovil/consultarRutas.php");
+        new ConsultarDatos().execute("http://10.0.2.2:8080/gpsmovil/consultarRutas.php");
 
 
 
@@ -144,8 +144,8 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
                             polylineFinal.remove();
                         }
                         PosicionAc = String.valueOf(rutaId[position]);
-                       new ConsultarTrasadorutas().execute("http://10.0.2.2:80/gpsmovil/consultarTrasadoRutas.php?id="+rutaId[position]+"");
-                        new ConsultarPuntosVehiculos().execute("http://10.0.2.2:80/gpsmovil/consultarPuntosRuta.php?id="+rutaId[position]+"");
+                       new ConsultarTrasadorutas().execute("http://10.0.2.2:8080/gpsmovil/consultarTrasadoRutas.php?id="+rutaId[position]+"");
+                        new ConsultarPuntosVehiculos().execute("http://10.0.2.2:8080/gpsmovil/consultarPuntosRuta.php?id="+rutaId[position]+"");
 
                         //new ConsultarTrasadorutas().execute("http://10.0.2.2:8080/gpsmovil/consultarTrasadoRutas.php?id=10945988182");
 
@@ -190,7 +190,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
 
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.van))
                         .position(new LatLng(Double.parseDouble(d[1]), Double.parseDouble(d[2])))
-                      .snippet("Dist:"+d[3]+"Km Velocidad: "+d[5]+"km/h Tiempo: "+d[4])
+                      .snippet("Dist:"+d[3]+"Km Vel: "+d[5]+"km/h Time: "+d[4])
 
 
 
@@ -329,8 +329,8 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
 // Create polyline options with existing LatLng ArrayList
         polylineOptions.addAll(listaCoordenadas);
         polylineOptions
-                .width(25)
-                .color(Color.BLUE)
+                .width(10)
+                .color(Color.DKGRAY)
                 .geodesic(true);
 
 // Adding multiple points in map using polyline and arraylist
@@ -499,7 +499,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
                  Flatitud=marker.getPosition().latitude;
                 Flogitud=marker.getPosition().longitude;
                 agregarMarcodora();
-                new ConsultarPuntosVehiculos().execute("http://10.0.2.2:80/gpsmovil/consultarPuntosRuta.php?id="+PosicionAc+"");
+                new ConsultarPuntosVehiculos().execute("http://10.0.2.2:8080/gpsmovil/consultarPuntosRuta.php?id="+PosicionAc+"");
 
 
             }
@@ -548,7 +548,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnPolyli
             lng = location.getLongitude();
             agregarMarcodor(lat, lng);
         }
-        new ConsultarPuntosVehiculos().execute("http://10.0.2.2:80/gpsmovil/consultarPuntosRuta.php?id="+PosicionAc+"");
+        new ConsultarPuntosVehiculos().execute("http://10.0.2.2:8080/gpsmovil/consultarPuntosRuta.php?id="+PosicionAc+"");
 
     }
 
